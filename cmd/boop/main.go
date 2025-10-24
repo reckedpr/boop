@@ -8,49 +8,44 @@ import (
 	"github.com/spf13/pflag"
 )
 
-type PathType struct {
-	IsFile bool
-	IsDir  bool
-}
+// need to hit tha hay, head is soo broked right now
 
-func ValidatePath(path string) PathType {
-	t := PathType{}
-
+func ValidatePath(path string) (IsFile bool, IsDir bool) {
 	fi, err := os.Stat(path)
 	if err != nil {
 		fmt.Println(err)
-		return t
+		IsFile = true
 	}
 
 	switch mode := fi.Mode(); {
 	case mode.IsDir():
-		t.IsDir = true
-		return t
+		IsDir = true
+		return
 	case mode.IsRegular():
-		t.IsFile = true
-		return t
+		IsFile = true
+		return
 	}
 
-	return t
+	return
 }
 
 func main() {
-	pathFlag := pflag.StringP("path", "p", "", "file or dirrr to uhhhhh ya")
+	pathFlag := pflag.StringP("path", "p", ".", "file or dirrr to uhhhhh ya")
 	pflag.Parse()
 
 	r := gin.Default()
 
-	test := ValidatePath(*pathFlag)
+	isFile, isDir := ValidatePath(*pathFlag)
 
-	if test.IsDir {
+	if isDir {
 		r.StaticFS("/", gin.Dir(*pathFlag, true))
-	} else if test.IsFile {
+	} else if isFile {
 		r.GET("/", func(c *gin.Context) {
 			c.File(*pathFlag)
 		})
 
 	} else {
-		fmt.Println("NEY")
+		fmt.Println("yeah nah")
 		os.Exit(1)
 	}
 
