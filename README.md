@@ -1,9 +1,21 @@
 # boop
 
-lil suttin to replace `python3 -m http.server`, when you just need to boop a file
+a more featured tool to replace them quick `python3 -m http.server`'s
 
-justa poc atm..
+for when you need to quickly
 
-will b good with good features promis >w<
+#### examples:
 
-yayayaya
+```bash
+# serve the current directory
+boop
+
+# serve a differant directory
+boop /home/reckedpr
+
+# serve output directly from stdin..
+echo hai | boop
+
+# ..or a files contents for example
+cat docker-compose.yml | boop
+```
