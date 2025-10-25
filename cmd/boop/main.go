@@ -11,6 +11,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func RenderHtml(path string, body string) string {
+	return fmt.Sprintf(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>boop /%s</title>
+</head>
+<body>
+	<h1>Dir listing for /%s</h1>
+    %s
+</body>
+</html>
+`, path, path, body)
+}
+
 func DisplayDir(c *gin.Context) {
 	reqPath := strings.TrimPrefix(c.Param("filepath"), "/")
 	relPath := path.Clean(reqPath)
@@ -25,12 +41,12 @@ func DisplayDir(c *gin.Context) {
 
 	if fi.IsDir() {
 		entries, _ := os.ReadDir(fullPath)
-		html := "<html><body>"
+		var body string
 
 		if fullPath != absRoot {
 			parentPath := path.Dir(relPath)
 
-			html += fmt.Sprintf(`<a href="/%s">..</a><br>`, parentPath)
+			body += fmt.Sprintf(`<a href="/%s">..</a><br>`, parentPath)
 		}
 
 		for _, e := range entries {
@@ -38,11 +54,12 @@ func DisplayDir(c *gin.Context) {
 			link := path.Join(relPath, name)
 			if e.IsDir() {
 				link += "/"
+				name += "/"
 			}
-			html += fmt.Sprintf(`<a href="/%s">%s</a><br>`, link, name)
+			body += fmt.Sprintf(`<a href="/%s">%s</a><br>`, link, name)
 		}
 
-		html += "</body></html>"
+		html := RenderHtml(reqPath, body)
 		c.Data(200, "text/html; charset=utf-8", []byte(html))
 	} else {
 		c.File(fullPath)
