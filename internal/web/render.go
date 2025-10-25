@@ -28,7 +28,7 @@ const HtmlTemplate string = `
         .list{
             display: flex;
             flex-direction: column;
-			font-size: 1.4rem;
+			font-size: 1.2rem;
         }
 		a{
             color: #c6d0f5;
