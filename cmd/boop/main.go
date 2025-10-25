@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 	"path"
@@ -10,22 +11,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
-
-func RenderHtml(path string, body string) string {
-	return fmt.Sprintf(`
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>boop /%s</title>
-</head>
-<body>
-	<h1>Dir listing for /%s</h1>
-    %s
-</body>
-</html>
-`, path, path, body)
-}
 
 func DisplayDir(c *gin.Context) {
 	reqPath := strings.TrimPrefix(c.Param("filepath"), "/")
@@ -52,22 +37,68 @@ func DisplayDir(c *gin.Context) {
 		for _, e := range entries {
 			name := e.Name()
 			link := path.Join(relPath, name)
+			class := ""
 			if e.IsDir() {
 				link += "/"
 				name += "/"
+				class += "dir"
 			}
-			body += fmt.Sprintf(`<a href="/%s">%s</a><br>`, link, name)
+			body += fmt.Sprintf(`<a class="%s" href="/%s">%s</a><br>`, class, link, name)
 		}
 
-		html := RenderHtml(reqPath, body)
-		c.Data(200, "text/html; charset=utf-8", []byte(html))
+		c.HTML(http.StatusOK, "dirlist", gin.H{
+			"Path": reqPath,
+			"Body": template.HTML(body),
+		})
 	} else {
 		c.File(fullPath)
 	}
 }
 
+const html string = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>boop /{{.Path}}</title>
+    <style>
+        body{
+            font-family: monospace;
+			background-color: #303446;
+			color: #c6d0f5;
+			padding: 8px 8px;
+        }
+        .list{
+            display: flex;
+            flex-direction: column;
+			font-size: 1.4rem;
+        }
+		a{
+            color: #c6d0f5;
+			text-decoration: none;
+        }
+
+		.dir { color: #a6d189; }
+		.dir :visited{ color: #a6d189; }
+    </style>
+</head>
+<body>
+	<h1>/{{.Path}}</h1>
+	
+    <div class="list">
+		{{.Body}}
+    </div>
+</body>
+</html>
+`
+
 func main() {
+
 	r := gin.Default()
+
+	tpl := template.Must(template.New("dirlist").Parse(html))
+
+	r.SetHTMLTemplate(tpl)
 
 	r.GET("/*filepath", func(c *gin.Context) {
 		DisplayDir(c)
