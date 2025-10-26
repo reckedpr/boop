@@ -34,7 +34,7 @@ const (
 	BgHiWhite   = "\033[107m"
 )
 
-var BoopPrefix = fmt.Sprintf("%s boop %s", BgHiMagenta, Reset)
+var BoopPrefix = fmt.Sprintf("%s%s boop %s", BgHiMagenta, FgBlack, Reset)
 
 func BoopLog(format string, a ...any) {
 	fmt.Printf("%s %s\n", BoopPrefix, fmt.Sprintf(format, a...))

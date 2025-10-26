@@ -4,9 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -65,24 +62,21 @@ func main() {
 		}
 	}()
 
-	// if time arg not default use tima, else normal
-	// TODO make uh CatchInterrupt func to handle interrupts on both timer and non timer
+	// timer stuff
+	var expiry <-chan time.Time
+
 	if args.Time > 0 {
-		expiry := time.Duration(args.Time) * time.Minute
-		cli.BoopLog("stopping after %v", expiry)
+		expiry = time.After(time.Duration(args.Time) * time.Minute)
 
-		<-time.After(expiry)
+		cli.BoopLog("stopping after %v minutes", args.Time)
+	}
 
-		server.Shutdown(srv, "timer expired !")
+	interrupt := server.CatchInterrupt()
 
-		os.Exit(0)
-	} else {
-		c := make(chan os.Signal, 1)
-		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-
-		signal := <-c
-		reason := fmt.Sprintf("caught signal %v", signal)
-
-		server.Shutdown(srv, reason)
+	select {
+	case <-expiry:
+		server.Shutdown(srv, "timer expired")
+	case <-interrupt:
+		server.Shutdown(srv, "caught interrupt")
 	}
 }
