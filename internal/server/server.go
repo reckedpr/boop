@@ -58,13 +58,11 @@ func PrintInterfaces(port int, host bool) {
 				ip = v.IP
 			}
 
-			if ip == nil || ip.To4() == nil {
+			if ip == nil || ip.To4() == nil || ip.IsLoopback() {
 				continue
 			}
 
-			if ip.IsPrivate() {
-				fmt.Printf("   > http://%s:%d\n", ip.String(), port)
-			}
+			fmt.Printf("   > http://%s:%d\n", ip.String(), port)
 		}
 	}
 }
