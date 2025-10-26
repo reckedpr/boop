@@ -10,14 +10,17 @@ is a more featured cli tool to replace them quick `python3 -m http.server`'s
 # serve the current directory
 boop
 
-# serve a differant directory
+# serve a different directory
 boop /home/reckedpr
 
 # serve from stdin
 echo hai | boop
 
-# serve contents for 5 minutes then stop
-cat docker-compose.yml | boop -t 5
+# serve file for 5 minutes then stop
+boop docker-compose.yml -t 5
+
+# bind to host and serve foo/
+boop foo/ --host
 ```
 
 #### install
