@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -63,6 +64,7 @@ func main() {
 		err := srv.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
 			cli.BoopLog("error lol: %s\n", err)
+			os.Exit(1)
 		}
 	}()
 

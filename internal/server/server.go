@@ -30,9 +30,16 @@ func CatchInterrupt() <-chan os.Signal {
 	return channel
 }
 
+func PrintAddress(addr string, port int) {
+	s := fmt.Sprintf("http://%s:%d", addr, port)
+	s = cli.Colorise(s, cli.FgCyan)
+	fmt.Printf("  > %s\n", s)
+}
+
 func PrintInterfaces(port int, host bool) {
 
-	fmt.Printf("   > http://localhost:%d\n", port)
+	fmt.Printf("\n")
+	PrintAddress("localhost", port)
 
 	if !host {
 		return
@@ -62,7 +69,7 @@ func PrintInterfaces(port int, host bool) {
 				continue
 			}
 
-			fmt.Printf("   > http://%s:%d\n", ip.String(), port)
+			PrintAddress(ip.String(), port)
 		}
 	}
 }

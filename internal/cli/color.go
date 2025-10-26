@@ -43,3 +43,11 @@ func BoopLog(format string, a ...any) {
 func BoopLogNl(format string, a ...any) {
 	fmt.Printf("\n%s %s\n", BoopPrefix, fmt.Sprintf(format, a...))
 }
+
+func Colorise(text string, attrs ...string) string {
+	out := ""
+	for _, a := range attrs {
+		out += a
+	}
+	return fmt.Sprintf("%s%s%s", out, text, Reset)
+}
