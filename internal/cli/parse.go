@@ -1,4 +1,4 @@
-package args
+package cli
 
 import (
 	"fmt"
@@ -8,19 +8,25 @@ import (
 	"github.com/spf13/pflag"
 )
 
-func ParsePath() (servePath string) {
-	pathFlag := pflag.StringP("path", "p", "", "file or dirrr to uhhhhh ya")
-	pflag.Parse()
+type cliArgs struct {
+	Path string
+	Port int
+}
 
-	if *pathFlag != "" {
-		servePath = *pathFlag
-	} else if len(pflag.Args()) > 0 {
-		servePath = pflag.Args()[0]
-	} else {
-		servePath = "."
+func ParseArgs() (argObj cliArgs) {
+	portFlag := pflag.IntP("port", "p", 8080, "port to serve")
+
+	pflag.Parse()
+	args := pflag.Args()
+
+	argObj.Path = "."
+	if len(args) > 0 {
+		argObj.Path = args[0]
 	}
 
-	return servePath
+	argObj.Port = *portFlag
+
+	return argObj
 }
 
 func ReadStdin() (isPiped bool, data string) {

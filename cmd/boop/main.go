@@ -6,8 +6,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/reckedpr/boop/internal/args"
-	"github.com/reckedpr/boop/internal/web"
+	"github.com/reckedpr/boop/internal/cli"
+	"github.com/reckedpr/boop/internal/render"
 )
 
 // hai
@@ -16,31 +16,35 @@ func initGin() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.New()
 
-	tpl := template.Must(template.New("dirlist").Parse(web.HtmlTemplate))
+	tpl := template.Must(template.New("dirlist").Parse(render.HtmlTemplate))
 	r.SetHTMLTemplate(tpl)
 
 	return r
 }
 
 func main() {
-	argPath := args.ParsePath()
+	args := cli.ParseArgs()
 
 	r := initGin()
 
-	isPiped, data := args.ReadStdin()
+	listenMessage := ""
+	isPiped, data := cli.ReadStdin()
 	if isPiped {
-		fmt.Println("boop serving from stdin")
+		listenMessage = "boop serving from stdin"
 
 		r.GET("/", func(c *gin.Context) {
 			c.String(http.StatusOK, string(data))
 		})
 	} else {
-		fmt.Printf("boop serving %s\n", argPath)
+		listenMessage = fmt.Sprintf("boop serving %s", args.Path)
 
 		r.GET("/*filepath", func(c *gin.Context) {
-			web.DisplayDir(c, argPath)
+			render.DisplayDir(c, args.Path)
 		})
 	}
 
-	r.Run()
+	fmt.Printf("%s on port %d (ctrl+c to stop)\n", listenMessage, args.Port)
+
+	itf := fmt.Sprintf(":%d", args.Port)
+	r.Run(itf)
 }
