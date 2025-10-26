@@ -11,10 +11,12 @@ import (
 type cliArgs struct {
 	Path string
 	Port int
+	Time int
 }
 
 func ParseArgs() (argObj cliArgs) {
 	portFlag := pflag.IntP("port", "p", 8080, "port to serve")
+	timeFlag := pflag.IntP("time", "t", 0, "time in minutes to serve for")
 
 	pflag.Parse()
 	args := pflag.Args()
@@ -25,6 +27,7 @@ func ParseArgs() (argObj cliArgs) {
 	}
 
 	argObj.Port = *portFlag
+	argObj.Time = *timeFlag
 
 	return argObj
 }
