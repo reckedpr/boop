@@ -35,13 +35,13 @@ func main() {
 	listenMessage := ""
 	isPiped, data := cli.ReadStdin()
 	if isPiped {
-		listenMessage = "boop serving from stdin"
+		listenMessage = "serving from stdin"
 
 		r.GET("/", func(c *gin.Context) {
 			c.String(http.StatusOK, string(data))
 		})
 	} else {
-		listenMessage = fmt.Sprintf("boop serving %s", args.Path)
+		listenMessage = fmt.Sprintf("serving %s", args.Path)
 
 		r.GET("/*filepath", func(c *gin.Context) {
 			render.DisplayDir(c, args.Path)
@@ -57,11 +57,11 @@ func main() {
 
 	// start gorountine
 	go func() {
-		fmt.Printf("%s on port %d (ctrl+c to stop)\n", listenMessage, args.Port)
+		cli.BoopLog("%s on port %d (ctrl+c to stop)", listenMessage, args.Port)
 
 		err := srv.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			fmt.Printf("error lol: %s\n", err)
+			cli.BoopLog("error lol: %s\n", err)
 		}
 	}()
 
@@ -69,7 +69,7 @@ func main() {
 	// TODO make uh CatchInterrupt func to handle interrupts on both timer and non timer
 	if args.Time > 0 {
 		expiry := time.Duration(args.Time) * time.Minute
-		fmt.Printf("boop will stop after %v\n", expiry)
+		cli.BoopLog("stopping after %v", expiry)
 
 		<-time.After(expiry)
 

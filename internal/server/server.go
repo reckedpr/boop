@@ -2,18 +2,19 @@ package server
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
+
+	"github.com/reckedpr/boop/internal/cli"
 )
 
 func Shutdown(srv *http.Server, reason string) {
-	fmt.Printf("\nboop shutting down: %s\n", reason)
+	cli.BoopLogNl("shutting down: %s", reason)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	if err := srv.Shutdown(ctx); err != nil {
-		fmt.Println("shutdown forcefully.. ", err)
+		cli.BoopLog("shutdown forcefully.. %s", err)
 	}
 }
