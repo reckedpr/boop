@@ -46,6 +46,9 @@ func main() {
 	}
 
 	itf := fmt.Sprintf(":%d", args.Port)
+	if args.Host {
+		itf = fmt.Sprintf("127.0.0.1:%d", args.Port)
+	}
 
 	srv := &http.Server{
 		Addr:    itf,
@@ -55,6 +58,7 @@ func main() {
 	// start gorountine
 	go func() {
 		cli.BoopLog("%s on port %d (ctrl+c to stop)", listenMessage, args.Port)
+		server.PrintInterfaces(args.Port, args.Host)
 
 		err := srv.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {

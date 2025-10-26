@@ -12,11 +12,14 @@ type cliArgs struct {
 	Path string
 	Port int
 	Time int
+	Host bool
 }
 
 func ParseArgs() (argObj cliArgs) {
 	portFlag := pflag.IntP("port", "p", 8080, "port to serve")
 	timeFlag := pflag.IntP("time", "t", 0, "time in minutes to serve for")
+
+	hostFlag := pflag.Bool("host", false, "bind to host (0.0.0.0)")
 
 	pflag.Parse()
 	args := pflag.Args()
@@ -28,6 +31,7 @@ func ParseArgs() (argObj cliArgs) {
 
 	argObj.Port = *portFlag
 	argObj.Time = *timeFlag
+	argObj.Host = *hostFlag
 
 	return argObj
 }

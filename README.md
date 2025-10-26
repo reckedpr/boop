@@ -30,6 +30,7 @@ go install github.com/reckedpr/boop/cmd/boop@latest
 
 ```
 Usage of boop:
+      --host       bind to host (0.0.0.0)
   -p, --port int   port to serve (default 8080)
   -t, --time int   time in minutes to serve for
 ```
