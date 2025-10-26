@@ -45,9 +45,9 @@ func main() {
 		})
 	}
 
-	itf := fmt.Sprintf(":%d", args.Port)
+	itf := fmt.Sprintf("127.0.0.1:%d", args.Port)
 	if args.Host {
-		itf = fmt.Sprintf("127.0.0.1:%d", args.Port)
+		itf = fmt.Sprintf(":%d", args.Port)
 	}
 
 	srv := &http.Server{
