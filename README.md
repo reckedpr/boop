@@ -1,8 +1,8 @@
 # boop
 
-is a more featured cli tool to replace them quick `python3 -m http.server`'s
+is a more featured cli tool to replace them `python3 -m http.server`'s
 
-..for everytime you need to boop something across the lan
+for when you need to quickly transfer or exfiltrate data
 
 #### examples
 
@@ -13,8 +13,8 @@ boop
 # serve a different directory
 boop /home/reckedpr
 
-# serve from stdin
-echo hai | boop
+# serve from stdin (as plaintext)
+sudo journalctl -u ssh | boop
 
 # serve file for 5 minutes then stop
 boop docker-compose.yml -t 5
@@ -37,3 +37,14 @@ Usage of boop:
   -p, --port int   port to serve (default 8080)
   -t, --time int   time in minutes to serve for
 ```
+
+#### alternatives
+\#humble
+probably better alternatives out there; this was more of a personal project..
+
+|lang|link|
+|-:|-|
+|JS| [http-party/http-server](https://github.com/http-party/http-server) |
+|Go| [projectdiscovery/simplehttpserver](https://github.com/projectdiscovery/simplehttpserver) |
+|Python| [sc0tfree/updog](https://github.com/sc0tfree/updog) |
+|Go| [eliben/static-server](https://github.com/eliben/static-server)
