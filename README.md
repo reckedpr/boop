@@ -1,8 +1,8 @@
-# boop
+# boop..
 
-is a more featured cli tool to replace them `python3 -m http.server`'s
+..is a more featured cli tool to replace them `python3 -m http.server`'s 
 
-for when you need to quickly transfer or exfiltrate data
+( a quick http server to transfer or exfiltrate data )
 
 #### examples
 
@@ -29,17 +29,23 @@ boop foo/ --host
 go install github.com/reckedpr/boop/cmd/boop@latest
 ```
 
-#### args
+#### usage
 
+```bash
+boop [path] [flags]
+#    ^ flags can come first, no order
 ```
-Usage of boop:
-      --host       bind to host (0.0.0.0)
-  -p, --port int   port to serve (default 8080)
-  -t, --time int   time in minutes to serve for
-```
+
+|arg|description| default
+|-|-|-|
+|`-p` or `--port`| port to serve on | 8080 |
+|`-t` or `--time`| time in minutes to serve for before stopping |∞|
+|`--host`| expose to host (bind to 0.0.0.0)| 127.0.0.1|
+|`-d` or `--download`| force clients to always download files (instead of viewing)| false|
 
 #### alternatives
 \#humble
+
 probably better alternatives out there; this was more of a personal project..
 
 |lang|link|
