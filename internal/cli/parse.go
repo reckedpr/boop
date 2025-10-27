@@ -9,17 +9,22 @@ import (
 )
 
 type CliArgs struct {
-	Path string
-	Port int
-	Time int
-	Host bool
+	Path  string
+	Port  int
+	Time  int
+	Host  bool
+	Dload bool
 }
 
-func ParseArgs() (argObj CliArgs) {
+func ParseArgs() *CliArgs {
+	argObj := CliArgs{}
+
 	portFlag := pflag.IntP("port", "p", 8080, "port to serve")
 	timeFlag := pflag.IntP("time", "t", 0, "time in minutes to serve for")
 
 	hostFlag := pflag.Bool("host", false, "bind to host (0.0.0.0)")
+
+	dloadFlag := pflag.BoolP("download", "d", false, "make clients download always")
 
 	pflag.Parse()
 	args := pflag.Args()
@@ -32,8 +37,9 @@ func ParseArgs() (argObj CliArgs) {
 	argObj.Port = *portFlag
 	argObj.Time = *timeFlag
 	argObj.Host = *hostFlag
+	argObj.Dload = *dloadFlag
 
-	return argObj
+	return &argObj
 }
 
 func ReadStdin() (isPiped bool, data string) {

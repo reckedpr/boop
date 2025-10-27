@@ -1,13 +1,10 @@
 package server
 
 import (
-	"context"
 	"fmt"
 	"html/template"
 	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -21,6 +18,13 @@ func InitGin() *gin.Engine {
 
 	tpl := template.Must(template.New("dirlist").Parse(dir.HtmlTemplate))
 	r.SetHTMLTemplate(tpl)
+
+	r.Use(func(c *gin.Context) {
+		c.Header("Cache-Control", "no-store")
+		c.Header("Pragma", "no-cache") // 4 the dinosaurs out there
+		c.Header("Expires", "0")
+		c.Next()
+	})
 
 	return r
 }
@@ -48,23 +52,6 @@ func InitServer(r *gin.Engine, args *cli.CliArgs, msg string) *http.Server {
 	}()
 
 	return srv
-}
-
-func Shutdown(srv *http.Server, reason string) {
-	cli.BoopLogNl("shutting down: %s", reason)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if err := srv.Shutdown(ctx); err != nil {
-		cli.BoopLog("shutdown forcefully.. %s", err)
-	}
-}
-
-func CatchInterrupt() <-chan os.Signal {
-	channel := make(chan os.Signal, 1)
-	signal.Notify(channel, os.Interrupt, syscall.SIGTERM)
-	return channel
 }
 
 func InterruptHandler(srv *http.Server, args *cli.CliArgs) {

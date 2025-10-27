@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"os"
 	"path"
-	"path/filepath"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -48,51 +46,6 @@ const HtmlTemplate string = `
 </body>
 </html>
 `
-
-type Path struct {
-	Req  string
-	Rel  string
-	Root string
-	Full string
-}
-
-func ResolvePath(c *gin.Context, root string) (*Path, error) {
-	req := strings.TrimPrefix(c.Param("filepath"), "/")
-	rel := path.Clean(req)
-	absRoot, _ := filepath.Abs(root)
-	full := filepath.Join(absRoot, rel)
-
-	if !strings.HasPrefix(full, absRoot+string(os.PathSeparator)) && full != absRoot {
-		return nil, fmt.Errorf("traversal")
-	}
-
-	return &Path{
-		Req:  req,
-		Rel:  rel,
-		Root: absRoot,
-		Full: full,
-	}, nil
-}
-
-func HandlePath(c *gin.Context, servePath string) {
-	p, err := ResolvePath(c, servePath)
-	if err != nil {
-		c.String(http.StatusNotFound, "file or dir not found")
-		return
-	}
-
-	fi, err := os.Stat(p.Full)
-	if err != nil {
-		c.String(http.StatusNotFound, "file or dir not found")
-		return
-	}
-
-	if fi.IsDir() {
-		RenderDirHtml(c, p) // club penguin
-	} else {
-		c.File(p.Full)
-	}
-}
 
 // TODO improve thiS whole ass html rendering
 func RenderDirHtml(c *gin.Context, p *Path) {

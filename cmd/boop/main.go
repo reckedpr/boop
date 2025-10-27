@@ -30,11 +30,11 @@ func main() {
 		listenMsg = fmt.Sprintf("serving %s", args.Path)
 
 		r.GET("/*filepath", func(c *gin.Context) {
-			dir.HandlePath(c, args.Path)
+			dir.HandlePath(c, args)
 		})
 	}
 
-	srv := server.InitServer(r, &args, listenMsg)
+	srv := server.InitServer(r, args, listenMsg)
 
-	server.InterruptHandler(srv, &args)
+	server.InterruptHandler(srv, args)
 }
