@@ -8,14 +8,14 @@ import (
 	"github.com/spf13/pflag"
 )
 
-type cliArgs struct {
+type CliArgs struct {
 	Path string
 	Port int
 	Time int
 	Host bool
 }
 
-func ParseArgs() (argObj cliArgs) {
+func ParseArgs() (argObj CliArgs) {
 	portFlag := pflag.IntP("port", "p", 8080, "port to serve")
 	timeFlag := pflag.IntP("time", "t", 0, "time in minutes to serve for")
 

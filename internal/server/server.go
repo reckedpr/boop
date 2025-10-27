@@ -3,15 +3,52 @@ package server
 import (
 	"context"
 	"fmt"
-	"net"
+	"html/template"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/reckedpr/boop/internal/cli"
+	"github.com/reckedpr/boop/internal/dir"
 )
+
+func InitGin() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.New()
+
+	tpl := template.Must(template.New("dirlist").Parse(dir.HtmlTemplate))
+	r.SetHTMLTemplate(tpl)
+
+	return r
+}
+
+func InitServer(r *gin.Engine, args *cli.CliArgs, msg string) *http.Server {
+	itf := fmt.Sprintf("127.0.0.1:%d", args.Port)
+	if args.Host {
+		itf = fmt.Sprintf(":%d", args.Port)
+	}
+
+	srv := &http.Server{
+		Addr:    itf,
+		Handler: r,
+	}
+
+	go func() {
+		cli.BoopLog("%s on port %d (ctrl+c to stop)", msg, args.Port)
+		PrintInterfaces(args.Port, args.Host)
+
+		err := srv.ListenAndServe()
+		if err != nil && err != http.ErrServerClosed {
+			cli.BoopLog("error lol: %s\n", err)
+			os.Exit(1)
+		}
+	}()
+
+	return srv
+}
 
 func Shutdown(srv *http.Server, reason string) {
 	cli.BoopLogNl("shutting down: %s", reason)
@@ -30,46 +67,21 @@ func CatchInterrupt() <-chan os.Signal {
 	return channel
 }
 
-func PrintAddress(addr string, port int) {
-	s := fmt.Sprintf("http://%s:%d", addr, port)
-	s = cli.Colorise(s, cli.FgCyan)
-	fmt.Printf("  > %s\n", s)
-}
+func InterruptHandler(srv *http.Server, args *cli.CliArgs) {
+	var expiry <-chan time.Time
 
-func PrintInterfaces(port int, host bool) {
+	if args.Time > 0 {
+		expiry = time.After(time.Duration(args.Time) * time.Minute)
 
-	fmt.Printf("\n")
-	PrintAddress("localhost", port)
-
-	if !host {
-		return
+		cli.BoopLog("expiring in %v minutes", args.Time)
 	}
 
-	ifaces, err := net.Interfaces()
-	if err != nil {
-		panic(err)
-	}
+	interrupt := CatchInterrupt()
 
-	for _, iface := range ifaces {
-		addrs, err := iface.Addrs()
-		if err != nil {
-			continue
-		}
-
-		for _, addr := range addrs {
-			var ip net.IP
-			switch v := addr.(type) {
-			case *net.IPNet:
-				ip = v.IP
-			case *net.IPAddr:
-				ip = v.IP
-			}
-
-			if ip == nil || ip.To4() == nil || ip.IsLoopback() {
-				continue
-			}
-
-			PrintAddress(ip.String(), port)
-		}
+	select {
+	case <-expiry:
+		Shutdown(srv, "timer expired")
+	case <-interrupt:
+		Shutdown(srv, "caught interrupt")
 	}
 }
