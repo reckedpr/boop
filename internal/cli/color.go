@@ -1,6 +1,11 @@
 package cli
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
+
+// i hate everything in this file, SO tacky but we ball
 
 const (
 	Reset = "\033[0m"
@@ -34,14 +39,54 @@ const (
 	BgHiWhite   = "\033[107m"
 )
 
-var BoopPrefix = fmt.Sprintf("%s%s boop %s", BgHiMagenta, FgBlack, Reset)
+var (
+	Verbose     = false
+	BoopPrefix  = fmt.Sprintf("%s%s boop %s", BgHiMagenta, FgBlack, Reset)
+	ErrorPrefix = fmt.Sprintf("%s%s  err %s", BgHiRed, FgBlack, Reset)
+	InfoPrefix  = fmt.Sprintf("%s%s info %s", BgHiYellow, FgBlack, Reset)
+)
 
-func BoopLog(format string, a ...any) {
-	fmt.Printf("%s %s\n", BoopPrefix, fmt.Sprintf(format, a...))
+func BoopLog(text string, a ...any) {
+	fmt.Printf("%s %s\n", BoopPrefix, fmt.Sprintf(text, a...))
 }
 
-func BoopLogNl(format string, a ...any) {
-	fmt.Printf("\n%s %s\n", BoopPrefix, fmt.Sprintf(format, a...))
+func BoopLogNl(text string, a ...any) {
+	fmt.Printf("\n%s %s\n", BoopPrefix, fmt.Sprintf(text, a...))
+}
+
+func BoopErr(text string) {
+	fmt.Printf("%s %s\n", ErrorPrefix, text)
+	os.Exit(1)
+}
+
+func BoopInfo(text string) {
+	if Verbose {
+		fmt.Printf("%s %s\n", InfoPrefix, text)
+	}
+}
+
+func BoopHttp(code int, text string) {
+	if !Verbose {
+		return
+	}
+
+	color := StatusToColor(code)
+	status := fmt.Sprintf("%s %d %s", color, code, Reset)
+
+	fmt.Printf("%s %s %s\n", BoopPrefix, status, text)
+}
+
+func StatusToColor(code int) string {
+	switch {
+	case code >= 200 && code < 300:
+		return FgBlack + BgHiGreen
+	case code >= 300 && code < 400:
+		return FgBlack + BgHiYellow
+	case code >= 400:
+		return FgBlack + BgHiRed
+	default:
+		return FgBlack + BgHiCyan
+	}
 }
 
 func Colorise(text string, attrs ...string) string {

@@ -40,7 +40,7 @@ func ResolvePath(c *gin.Context, root string) (*Path, error) {
 func HandlePath(c *gin.Context, args *cli.CliArgs) {
 	p, err := ResolvePath(c, args.Path)
 	if err != nil {
-		c.String(http.StatusNotFound, "file or dir not found")
+		c.String(404, "file or dir not found")
 		return
 	}
 

@@ -4,7 +4,7 @@
 
 ( a quick http server to transfer or exfiltrate data )
 
-#### examples
+### examples
 
 ```bash
 # serve the current directory
@@ -23,13 +23,13 @@ boop docker-compose.yml -t 5
 boop foo/ --host
 ```
 
-#### install
+### install
 
 ```bash
 go install github.com/reckedpr/boop/cmd/boop@latest
 ```
 
-#### usage
+### usage
 
 ```bash
 boop [path] [flags]
@@ -42,8 +42,9 @@ boop [path] [flags]
 |`-t` or `--time`| time in minutes to serve for before stopping |∞|
 |`--host`| expose to host (bind to 0.0.0.0)| 127.0.0.1|
 |`-d` or `--download`| force clients to always download files (instead of viewing)| false|
+|`-v` or `--verbose`| verbose output (includes requests) | false|
 
-#### alternatives
+### alternatives
 \#humble
 
 probably better alternatives out there; this was more of a personal project..

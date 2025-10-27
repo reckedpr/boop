@@ -26,6 +26,8 @@ func ParseArgs() *CliArgs {
 
 	dloadFlag := pflag.BoolP("download", "d", false, "make clients download always")
 
+	verboseFlag := pflag.BoolP("verbose", "v", false, "verbose mode")
+
 	pflag.Parse()
 	args := pflag.Args()
 
@@ -38,6 +40,10 @@ func ParseArgs() *CliArgs {
 	argObj.Time = *timeFlag
 	argObj.Host = *hostFlag
 	argObj.Dload = *dloadFlag
+
+	if *verboseFlag {
+		Verbose = true
+	}
 
 	return &argObj
 }

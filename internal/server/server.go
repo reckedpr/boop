@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -26,10 +25,13 @@ func InitGin() *gin.Engine {
 		c.Next()
 	})
 
+	r.Use(BoopLogger())
+
 	return r
 }
 
 func InitServer(r *gin.Engine, args *cli.CliArgs, msg string) *http.Server {
+	cli.BoopInfo("initialising http server")
 	itf := fmt.Sprintf("127.0.0.1:%d", args.Port)
 	if args.Host {
 		itf = fmt.Sprintf(":%d", args.Port)
@@ -41,15 +43,14 @@ func InitServer(r *gin.Engine, args *cli.CliArgs, msg string) *http.Server {
 	}
 
 	go func() {
-		cli.BoopLog("%s on port %d (ctrl+c to stop)", msg, args.Port)
-		PrintInterfaces(args.Port, args.Host)
-
 		err := srv.ListenAndServe()
 		if err != nil && err != http.ErrServerClosed {
-			cli.BoopLog("error lol: %s\n", err)
-			os.Exit(1)
+			cli.BoopErr(err.Error())
 		}
 	}()
+
+	cli.BoopLog("%s on port %d (ctrl+c to stop)", msg, args.Port)
+	PrintInterfaces(args.Port, args.Host)
 
 	return srv
 }
